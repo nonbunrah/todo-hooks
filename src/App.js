@@ -1,7 +1,47 @@
 import React, { useState } from 'react';
+import './App.css';
+
+function Todo({todo, index, completeTodo, removeTodo}) {
+  return(
+    <div style={{textDecoration: todo.isCompleted ? 'line-through' : ''}} 
+      className='todo'>
+      { todo.text }
+      <div>
+        <button onClick={() => completeTodo(index)}>Complete</button>
+        <button onClick={() => removeTodo(index)}>Delete</button>
+      </div>
+    </div>
+  )
+}
+
+function TodoForm({addTodo}) {
+  const[value, setValue] = useState('');
+
+  let handleSubmit = e => {
+    // don't want default behavior
+    e.preventDefault();
+    // don't want empty value in input
+    if (!value) return;
+    addTodo(value);
+    setValue('');
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input 
+        type='text' 
+        className='input' 
+        value={value} 
+        onChange={e => setValue(e.target.value)}
+        placeholder='Add Todo...'
+      />
+    </form>
+  )
+}
 
 function App() {
 
+  // state is created
   const [ todos, setTodos ] = useState([
     {
       text: 'Learn about React',
@@ -17,9 +57,38 @@ function App() {
     }
   ]);
 
-  return (
-    <div>
+  const addTodo = text => {
+    const newTodos = [...todos, { text }];
+    setTodos(newTodos);
+  };
 
+  const completeTodo = index => {
+    const newTodos = [...todos];
+    newTodos[index].isCompleted = true;
+    setTodos(newTodos);
+  };
+
+  const removeTodo = index => {
+    const newTodos = [...todos];
+    newTodos.splice(index, 1);
+    setTodos(newTodos);
+  }
+
+  return (
+    <div className='app'>
+      <div className='todo-list'>
+        {/* todos state is being mapped through below and displayed */}
+        {todos.map((todo, index) => (
+          <Todo 
+            key={index} 
+            index={index} 
+            todo={todo} 
+            completeTodo={completeTodo}
+            removeTodo={removeTodo}
+          />
+        ))}
+        <TodoForm addTodo={addTodo} />
+      </div>
     </div>
   )
 }
